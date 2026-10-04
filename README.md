@@ -120,7 +120,6 @@ Open your browser and navigate to:
 ```
 http://localhost:3000
 ```
-
 You will see:
 - A list of 10 fictional customers with failed payments
 - Status indicators showing server and Twilio configuration
@@ -275,13 +274,3 @@ For a production deployment, you would need to:
 10. **Retry Logic**: Implement automatic retry for failed calls
 11. **SMS Integration**: Add actual SMS confirmations
 12. **Customer Service Routing**: Integrate with actual customer service system
-
-## License
-
-ISC
-
-## Support
-
-For issues or questions, please refer to:
-- Twilio documentation: https://www.twilio.com/docs
-- Express documentation: https://expressjs.com/
