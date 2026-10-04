@@ -1,0 +1,102 @@
+[
+  {
+    "id": "CUST001",
+    "name": "John Smith",
+    "phone": "+15550000001",
+    "amount": 125.50,
+    "dueDate": "2026-10-01",
+    "failedReason": "Insufficient funds",
+    "paymentMethod": "Visa ending in 4242",
+    "attempts": 1
+  },
+  {
+    "id": "CUST002",
+    "name": "Sarah Johnson",
+    "phone": "+15550000002",
+    "amount": 89.99,
+    "dueDate": "2026-10-02",
+    "failedReason": "Card expired",
+    "paymentMethod": "Mastercard ending in 5555",
+    "attempts": 2
+  },
+  {
+    "id": "CUST003",
+    "name": "Michael Brown",
+    "phone": "+15550000003",
+    "amount": 250.00,
+    "dueDate": "2026-10-01",
+    "failedReason": "Bank declined",
+    "paymentMethod": "Visa ending in 1234",
+    "attempts": 1
+  },
+  {
+    "id": "CUST004",
+    "name": "Emily Davis",
+    "phone": "+15550000004",
+    "amount": 45.75,
+    "dueDate": "2026-10-03",
+    "failedReason": "Payment method not on file",
+    "paymentMethod": "None",
+    "attempts": 0
+  },
+  {
+    "id": "CUST005",
+    "name": "David Wilson",
+    "phone": "+15550000005",
+    "amount": 175.25,
+    "dueDate": "2026-10-02",
+    "failedReason": "Insufficient funds",
+    "paymentMethod": "Amex ending in 1001",
+    "attempts": 3
+  },
+  {
+    "id": "CUST006",
+    "name": "Jessica Martinez",
+    "phone": "+15550000006",
+    "amount": 99.99,
+    "dueDate": "2026-10-01",
+    "failedReason": "Card expired",
+    "paymentMethod": "Visa ending in 9876",
+    "attempts": 1
+  },
+  {
+    "id": "CUST007",
+    "name": "Robert Garcia",
+    "phone": "+15550000007",
+    "amount": 320.50,
+    "dueDate": "2026-10-03",
+    "failedReason": "Bank declined",
+    "paymentMethod": "Mastercard ending in 2468",
+    "attempts": 2
+  },
+  {
+    "id": "CUST008",
+    "name": "Amanda Lee",
+    "phone": "+15550000008",
+    "amount": 67.50,
+    "dueDate": "2026-10-02",
+    "failedReason": "Insufficient funds",
+    "paymentMethod": "Visa ending in 1357",
+    "attempts": 1
+  },
+  {
+    "id": "CUST009",
+    "name": "Christopher Taylor",
+    "phone": "+15550000009",
+    "amount": 210.00,
+    "dueDate": "2026-10-01",
+    "failedReason": "Payment method not on file",
+    "paymentMethod": "None",
+    "attempts": 0
+  },
+  {
+    "id": "CUST010",
+    "name": "Michelle Anderson",
+    "phone": "+15550000010",
+    "amount": 145.75,
+    "dueDate": "2026-10-03",
+    "failedReason": "Card expired",
+    "paymentMethod": "Mastercard ending in 8642",
+    "attempts": 2
+  }
+]

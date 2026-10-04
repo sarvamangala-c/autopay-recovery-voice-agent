@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autopay Recovery Voice Agent</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding: 15px;
+      background: #f7f7f7;
+      border-radius: 8px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ccc;
+    }
+
+    .status-dot.active {
+      background: #4caf50;
+    }
+
+    .status-dot.inactive {
+      background: #f44336;
+    }
+
+    .customers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+    }
+
+    .customer-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .customer-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .customer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 15px;
+    }
+
+    .customer-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .customer-id {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .amount-badge {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .customer-details {
+      margin-bottom: 15px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: #666;
+    }
+
+    .detail-value {
+      color: #333;
+      font-weight: 500;
+    }
+
+    .failed-reason {
+      color: #f44336;
+    }
+
+    .call-button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .call-button:hover {
+      opacity: 0.9;
+    }
+
+    .call-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .call-button.calling {
+      background: #4caf50;
+    }
+
+    .logs-section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-top: 30px;
+    }
+
+    .logs-section h2 {
+      color: #333;
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+
+    .log-entry {
+      padding: 10px;
+      background: #f7f7f7;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .log-entry:last-child {
+      margin-bottom: 0;
+    }
+
+    .no-logs {
+      color: #999;
+      font-style: italic;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+
+    .notification.success {
+      background: #4caf50;
+    }
+
+    .notification.error {
+      background: #f44336;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Autopay Recovery Voice Agent</h1>
+      <p class="subtitle">Automated payment recovery system using Twilio voice integration</p>
+      <div class="status-bar">
+        <div class="status-indicator">
+          <div class="status-dot" id="serverStatus"></div>
+          <span id="serverStatusText">Checking server status...</span>
+        </div>
+        <div class="status-indicator">
+          <div class="status-dot" id="twilioStatus"></div>
+          <span id="twilioStatusText">Checking Twilio config...</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="customers-grid" id="customersGrid">
+      <p>Loading customers...</p>
+    </div>
+
+    <div class="logs-section">
+      <h2>Call Logs</h2>
+      <div id="callLogs">
+        <p class="no-logs">No calls made yet</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let customers = [];
+    let callLogs = [];
+
+    // Check server health
+    async function checkHealth() {
+      try {
+        const response = await fetch('/api/health');
+        const data = await response.json();
+
+        const serverDot = document.getElementById('serverStatus');
+        const serverText = document.getElementById('serverStatusText');
+        const twilioDot = document.getElementById('twilioStatus');
+        const twilioText = document.getElementById('twilioStatusText');
+
+        serverDot.classList.add('active');
+        serverText.textContent = 'Server online';
+
+        if (data.twilioConfigured) {
+          twilioDot.classList.add('active');
+          twilioText.textContent = 'Twilio configured';
+        } else {
+          twilioDot.classList.add('inactive');
+          twilioText.textContent = 'Twilio not configured (check .env)';
+        }
+      } catch (error) {
+        const serverDot = document.getElementById('serverStatus');
+        const serverText = document.getElementById('serverStatusText');
+        serverDot.classList.add('inactive');
+        serverText.textContent = 'Server offline';
+      }
+    }
+
+    // Load customers
+    async function loadCustomers() {
+      try {
+        const response = await fetch('/api/customers');
+        customers = await response.json();
+        renderCustomers();
+      } catch (error) {
+        console.error('Error loading customers:', error);
+        document.getElementById('customersGrid').innerHTML = '<p>Error loading customers</p>';
+      }
+    }
+
+    // Render customers
+    function renderCustomers() {
+      const grid = document.getElementById('customersGrid');
+      grid.innerHTML = customers.map(customer => `
+        <div class="customer-card">
+          <div class="customer-header">
+            <div>
+              <div class="customer-name">${customer.name}</div>
+              <div class="customer-id">${customer.id}</div>
+            </div>
+            <div class="amount-badge">$${customer.amount.toFixed(2)}</div>
+          </div>
+          <div class="customer-details">
+            <div class="detail-row">
+              <span class="detail-label">Phone:</span>
+              <span class="detail-value">${customer.phone}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Due Date:</span>
+              <span class="detail-value">${customer.dueDate}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Failed Reason:</span>
+              <span class="detail-value failed-reason">${customer.failedReason}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Payment Method:</span>
+              <span class="detail-value">${customer.paymentMethod}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Attempts:</span>
+              <span class="detail-value">${customer.attempts}</span>
+            </div>
+          </div>
+          <button class="call-button" onclick="initiateCall('${customer.id}', this)">
+            Initiate Recovery Call
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Initiate call
+    async function initiateCall(customerId, button) {
+      button.disabled = true;
+      button.textContent = 'Calling...';
+      button.classList.add('calling');
+
+      try {
+        const response = await fetch('/api/call', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ customerId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showNotification('Call initiated successfully!', 'success');
+          loadCallLogs();
+        } else {
+          showNotification(`Error: ${data.message}`, 'error');
+        }
+      } catch (error) {
+        showNotification('Failed to initiate call', 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Initiate Recovery Call';
+        button.classList.remove('calling');
+      }
+    }
+
+    // Load call logs
+    async function loadCallLogs() {
+      try {
+        const response = await fetch('/api/call-logs');
+        callLogs = await response.json();
+        renderCallLogs();
+      } catch (error) {
+        console.error('Error loading call logs:', error);
+      }
+    }
+
+    // Render call logs
+    function renderCallLogs() {
+      const logsContainer = document.getElementById('callLogs');
+
+      if (callLogs.length === 0) {
+        logsContainer.innerHTML = '<p class="no-logs">No calls made yet</p>';
+        return;
+      }
+
+      logsContainer.innerHTML = callLogs.map(log => `
+        <div class="log-entry">
+          <strong>${log.customerName}</strong> (${log.customerId}) - 
+          Status: ${log.status} - 
+          Call SID: ${log.callSid} - 
+          ${new Date(log.timestamp).toLocaleString()}
+        </div>
+      `).join('');
+    }
+
+    // Show notification
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
+    // Initialize
+    checkHealth();
+    loadCustomers();
+    loadCallLogs();
+  </script>
+</body>
+</html>
